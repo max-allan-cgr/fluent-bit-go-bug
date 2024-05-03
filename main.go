@@ -2,6 +2,7 @@ package main
 
 import (
 	"C"
+	"io"
 	"fmt"
 	"time"
 	"unsafe"
@@ -51,17 +52,17 @@ func FLBPluginFlush(data unsafe.Pointer, length C.int, tag *C.char) int {
 		case uint64:
 			timestamp = time.Unix(int64(t), 0)
 		default:
-			fmt.Println("time provided invalid, defaulting to now.")
+			fmt.Fprintln(io.Discard, "time provided invalid, defaulting to now.")
 			timestamp = time.Now()
 		}
 
 		// Print record keys and values
-		fmt.Printf("[%d] %s: [%s, {", count, C.GoString(tag),
+		fmt.Fprintf(io.Discard, "[%d] %s: [%s, {", count, C.GoString(tag),
 			timestamp.String())
 		for k, v := range record {
-			fmt.Printf("\"%s\": %v, ", k, v)
+			fmt.Fprintf(io.Discard, "\"%s\": %v, ", k, v)
 		}
-		fmt.Printf("}\n")
+		fmt.Fprintln(io.Discard, "}\n")
 		count++
 	}
 
